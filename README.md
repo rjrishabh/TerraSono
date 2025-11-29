@@ -1,83 +1,112 @@
-🌍 TerraSono
-A Sustainable, Modular Edge-AI Acoustic Intelligence System for Forest & Marine Habitats
-TerraSono is a solar-powered, low-power, reconfigurable acoustic monitoring platform designed to protect forests, wildlife, and marine ecosystems using Edge AI, LoRa communication, and cloud-based analytics.
+# 🌍 TerraSono  
+### **A Sustainable, Modular Edge-AI Acoustic Intelligence System for Forest & Marine Habitats**
 
-🌱 Project Overview
-TerraSono gives nature a voice.
-It detects harmful and suspicious acoustic events such as:
-🔊 Chainsaw sounds → Illegal logging
-🔫 Gunshots → Poaching
-🚙 Vehicle activity → Intrusion
-🌊 Future: Marine acoustic anomalies using hydrophones
-Using Edge AI running directly on the ESP32-S3, the system performs real-time audio classification at the edge, sends only meaningful events over LoRa, and logs everything into the cloud for analysis.
+TerraSono is a **solar-powered, low-power, reconfigurable acoustic monitoring platform** designed to protect **forests, wildlife, and marine ecosystems** using **Edge AI + LoRa + Cloud analytics**.
 
-TerraSono is designed as:
-♻️ Sustainable – Solar-powered, repairable, recyclable enclosure
-🔌 Low-Power – Days to weeks of runtime on 18650 battery
-🔁 Modular – Swap between MEMS mic (forest) and hydrophone (marine)
-🗂️ Decentralized – Multi-node LoRa mesh to gateway
-☁️ Cloud-Enabled – MQTT → Node-RED → InfluxDB → Grafana
+---
 
-🛰️ System Architecture
-[Forest / Marine Sounds]
-        ↓
-[TerraSono Slave Node]
-  - INMP441 MEMS Mic (Forest)
-  - Hydrophone (Marine, in progress)
-  - ESP32-S3 + Edge Impulse TinyML
-  - LoRa SX1262 TX
-        ↓
-[TerraSono Gateway Node]
-  - LoRa RX
-  - ESP32-S3 WiFi
-  - MQTT Publisher
-        ↓
-[FlowFuse MQTT Broker]
-        ↓
-[Node-RED]
-        ↓
-[InfluxDB]
-        ↓
-[Grafana Dashboard]
+## 📘 Project Overview
 
-🔧 Hardware Used
-Core Modules
-ESP32-S3 Microcontroller
-SX1262 LoRa Module
-INMP441 I²S MEMS Microphone (forest sensing)
-18650 Li-ion Cell (3.4Ah)
-BQ25185 Li-ion Solar Charger
-6V / 100mA Solar Panel
-SD Card for data logging
-Enclosures
-IP65 forest enclosure
+TerraSono gives nature a digital voice.
 
-Marine floating buoy module (in development)
-Modular connectors (M8) for easy mic swapping
+It detects harmful or suspicious acoustic events such as:
 
-🧠 AI Model (Edge Impulse)
+- 🔊 **Chainsaw** → Illegal logging  
+- 🔫 **Gunshot** → Poaching  
+- 🚙 **Vehicle noise** → Unauthorized intrusion  
+- 🌊 *Future:* Marine noise anomalies (hydrophone module)
 
-The TinyML model detects:
-Chainsaw
-Gunshot
-Vehicle
-Ambient / Normal Forest Noise
+On-device TinyML running on the **ESP32-S3** performs real-time classification and sends only meaningful events via **LoRa** to a gateway.  
+The gateway pushes data to the cloud for visualization and alerts.
 
-Model Training Pipeline:
-Dataset collected using TerraSono node
-Data uploaded to Edge Impulse Studio
-MFCC feature extraction
-Classification model (CNN)
-Continuous inference enabled
-Model exported as Arduino library
-Integrated into ESP32-S3 firmware
+### **Why TerraSono?**
 
-📡 Communication Flow
-Slave Node
-Runs Edge AI
-Detects events
-Creates JSON:
+- ♻️ **Sustainable** – Solar charging, recyclable enclosure, long lifetime  
+- 🔌 **Low Power** – Runtime of days to weeks  
+- 🔄 **Modular** – Swap MEMS mic ↔ hydrophone in seconds  
+- 🛰️ **Decentralized** – Multi-node LoRa field deployment  
+- 📊 **Cloud-Ready** – MQTT → FlowFuse → Node-RED → InfluxDB → Grafana  
 
+---
+
+## 🛰️ System Architecture
+
+### 🔊 **1. Acoustic Environment**
+Forest sounds / marine sounds → chainsaw, gunshot, vehicle, marine noise
+
+### 🎙️ **2. TerraSono Slave Node (Edge AI + LoRa TX)**
+- ESP32-S3  
+- INMP441 / Hydrophone  
+- Edge Impulse TinyML  
+- LoRa SX1262 (Transmit)  
+- SD Card Logging  
+
+### 📡 **3. TerraSono Gateway Node (LoRa RX → WiFi)**
+- ESP32-S3  
+- Receives LoRa JSON  
+- Publishes MQTT packets  
+
+### ☁️ **4. Cloud Pipeline**
+- **FlowFuse MQTT Broker**  
+- **Node-RED** (processing + InfluxDB write)  
+- **InfluxDB v2** (time-series storage)  
+
+### 📊 **5. Grafana Dashboard**
+- Real-time alerts  
+- Event table  
+- Node health  
+- Confidence timelines  
+- Battery trends  
+
+
+---
+
+## 🔧 Hardware Used
+
+### **Core Electronics**
+- ESP32-S3  
+- SX1262 LoRa transceiver  
+- INMP441 I²S MEMS microphone  
+- PCM1808 ADC + Piezo Hydrophone (marine prototype)  
+- 18650 Li-ion cell (3.4Ah)  
+- BQ25185 solar charger IC  
+- 6V / 100mA solar panel  
+- SD card module (audio snapshot logging)
+
+### **Enclosures**
+- IP65 forest housing  
+- Marine floating buoy (in development)  
+- Modular M8 connector for sensor swapping  
+
+---
+
+## 🧠 Edge AI Model (Edge Impulse)
+
+The TinyML classifier detects:
+
+- **Chainsaw**  
+- **Gunshot**  
+- **Vehicle engine**  
+- **Ambient forest sounds**  
+
+### Training Workflow:
+1. Audio data collected using TerraSono node  
+2. Uploaded to **Edge Impulse Studio**  
+3. MFCC audio features  
+4. CNN classifier  
+5. Continuous inference enabled  
+6. Exported as Arduino library  
+7. Integrated into ESP32-S3 firmware  
+
+---
+
+## 📡 Communication Pipeline
+
+### **Slave Node → Gateway (LoRa)**
+Slave node runs inference every ~100ms.  
+On detection above threshold, it sends JSON:
+
+```json
 {
   "node_id": "TS001",
   "event": "chainsaw",
@@ -85,40 +114,3 @@ Creates JSON:
   "timestamp": 1730899000
 }
 
-Sends JSON over LoRa
-Gateway Node
-Receives LoRa JSON
-Parses and uploads to MQTT broker using WiFi
-
-☁️ Cloud & Dashboard Setup
-1. MQTT (FlowFuse)
-Topic: terrasano/events
-JSON payload format (above)
-
-2. Node-RED
-MQTT In → JSON → InfluxDB Out
-
-3. InfluxDB
-Bucket: terrasano_data
-Retention: 30 days
-Measurement: acoustic_events
-
-4. Grafana Dashboard
-
-Panels:
-Real-time event stream
-Event heatmap
-Node activity map
-Battery trends
-Timestamped event list
-
-🔋 Power Calculations (Demo Setup)
-Battery: 18650, 3.4Ah
-Avg device current (inference + LoRa TX duty-cycle limited): 40–60mA
-Estimated runtime: ~48–72 hours continuous
-Solar input: 6V @ 100mA → ~0.6W
-Daytime charging restores ~20–30% battery per hour of sun
-Designed for multi-week deployment
-
-
- had excellent build quality, precise soldering, and on-time delivery.
